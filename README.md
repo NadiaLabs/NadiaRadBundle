@@ -1,4 +1,4 @@
 NadiaRadBundle
 ==============
 
-NadiaRadBundle provides tools for deveolping Symfony application easily and rapidly.
+NadiaRadBundle provides tools for developing Symfony application easily and rapidly.
