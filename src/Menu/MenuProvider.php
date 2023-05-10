@@ -103,7 +103,7 @@ final class MenuProvider
 
                 foreach ($options as $key => $value) {
                     if (strlen($key) > 1 && '@' === $key[0]) {
-                        $menu[$index]['options']['extra'][substr($key, 1)] = $value;
+                        $menu[$index]['options']['extras'][substr($key, 1)] = $value;
                         unset($options[$key]);
                     } else {
                         $menu[$index]['options'][$key] = $value;
