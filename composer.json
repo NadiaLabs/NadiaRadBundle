@@ -5,6 +5,7 @@
     "description": "NadiaRadBundle provides tools for developing Symfony application easily and rapidly.",
     "require": {
         "php": ">=8.1",
+        "knplabs/knp-menu-bundle": "^3.2",
         "symfony/dependency-injection": "^6.2"
     },
     "require-dev": {
