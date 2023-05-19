@@ -11,6 +11,7 @@
 
 namespace Nadia\Bundle\NadiaRadBundle\DependencyInjection\Compiler;
 
+use Nadia\Bundle\NadiaRadBundle\Security\Controller\EditUserRolesController;
 use Nadia\Bundle\NadiaRadBundle\Security\Role\RoleHierarchyProvider;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
@@ -19,15 +20,16 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
-class RoleHierarchyBuilderPass implements CompilerPassInterface
+class RoleTreeBuilderPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        $taggedServices = $container->findTaggedServiceIds('nadia.tag.role_hierarchy_builder');
-        $cacheDir = $container->getParameter('nadia.security.role_hierarchy.cache_dir');
+        $taggedServices = $container->findTaggedServiceIds('nadia.tag.role_tree_builder');
+        $cacheDir = $container->getParameter('nadia.security.role_tree.cache_dir');
         $fs = new Filesystem();
         $finder = new Finder();
-        $map = [];
+        $roleTreeBuilderMap = [];
+        $userProviderMap = [];
 
         foreach ($finder->files()->in($cacheDir) as $file) {
             $fs->remove($file);
@@ -35,14 +37,20 @@ class RoleHierarchyBuilderPass implements CompilerPassInterface
 
         foreach ($taggedServices as $id => $tags) {
             $firewallName = $tags[0]['firewall_name'];
-            $map[$firewallName] = new Reference($id);
+            $roleTreeBuilderMap[$firewallName] = new Reference($id);
 
             $className = $container->getDefinition($id)->getClass();
             // Register RoleHierarchyBuilder file for resource tracking
             $container->fileExists((new \ReflectionClass($className))->getFileName());
+
+            $firewallConfigDefinition = $container->getDefinition('security.firewall.map.config.' . $firewallName);
+            $userProviderMap[$firewallName] = new Reference($firewallConfigDefinition->getArgument(5));
         }
 
         $container->getDefinition(RoleHierarchyProvider::class)
-            ->setArgument(0, ServiceLocatorTagPass::register($container, $map));
+            ->setArgument(0, ServiceLocatorTagPass::register($container, $roleTreeBuilderMap));
+
+        $container->getDefinition(EditUserRolesController::class)
+            ->setArgument(0, ServiceLocatorTagPass::register($container, $userProviderMap));
     }
 }

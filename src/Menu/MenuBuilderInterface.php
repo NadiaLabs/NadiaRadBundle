@@ -13,7 +13,7 @@ namespace Nadia\Bundle\NadiaRadBundle\Menu;
 
 use Nadia\Bundle\NadiaRadBundle\Menu\Item\MenuRootItem;
 
-interface MenuBuilder
+interface MenuBuilderInterface
 {
     /**
      * Build menu items.
@@ -21,8 +21,10 @@ interface MenuBuilder
      * Example:
      * <code>
      * #[AutoconfigureTag('nadia.tag.menu_builder', ['menu_name' => 'main'])]
-     * class ExampleMenuLoader implement MenuBuilder {
-     *   public function build(MenuRootItem $root): void {
+     * class ExampleMenuLoader implement MenuBuilderInterface
+     * {
+     *   public function build(MenuRootItem $root): void
+     *   {
      *     $m = $root;
      *     $m
      *       ->children([

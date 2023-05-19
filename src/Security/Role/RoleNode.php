@@ -16,8 +16,8 @@ namespace Nadia\Bundle\NadiaRadBundle\Security\Role;
  *
  * Example:
  * <code>
- * // Root RoleHierarchyItem contains all roles.
- * $r = new RoleHierarchyItem('Super User', 'ROLE_SUPER_USER');
+ * // Root RoleNode contains all roles.
+ * $r = new RoleNode('Super User', 'ROLE_SUPER_USER');
  * $r->children([
  *   $r->new('Project Management', 'ROLE_PROJECT')->children([
  *     $r->new('View Project', 'ROLE_PROJECT_VIEW'),
@@ -34,14 +34,14 @@ namespace Nadia\Bundle\NadiaRadBundle\Security\Role;
  * ]);
  * </code>
  */
-final class RoleHierarchyItem
+final class RoleNode
 {
     public string $title = '';
 
     public string $roleName;
 
     /**
-     * @var RoleHierarchyItem[]
+     * @var RoleNode[]
      */
     public array $children = [];
 
@@ -59,7 +59,7 @@ final class RoleHierarchyItem
     }
 
     /**
-     * @param RoleHierarchyItem[] $children
+     * @param RoleNode[] $children
      *
      * @return $this
      */
@@ -70,8 +70,8 @@ final class RoleHierarchyItem
         return $this;
     }
 
-    public function new(string $title, string $roleName): RoleHierarchyItem
+    public function new(string $title, string $roleName): RoleNode
     {
-        return new RoleHierarchyItem($title, $roleName);
+        return new RoleNode($title, $roleName);
     }
 }

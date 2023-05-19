@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Role\RoleHierarchy;
 
 final class RoleHierarchyProvider
 {
-    private ServiceLocator $roleHierarchyBuilders;
+    private ServiceLocator $roleTreeBuilders;
 
     private string $cacheDir;
 
@@ -26,9 +26,9 @@ final class RoleHierarchyProvider
      */
     private array $cachedRoleHierarchy = [];
 
-    public function __construct(ServiceLocator $roleHierarchyBuilders, string $cacheDir)
+    public function __construct(ServiceLocator $roleTreeBuilders, string $cacheDir)
     {
-        $this->roleHierarchyBuilders = $roleHierarchyBuilders;
+        $this->roleTreeBuilders = $roleTreeBuilders;
         $this->cacheDir = $cacheDir;
     }
 
@@ -52,28 +52,35 @@ final class RoleHierarchyProvider
 
     public function getWithoutCache(string $firewallName): RoleHierarchy
     {
-        /** @var RoleHierarchyBuilder $builder */
-        $builder = $this->roleHierarchyBuilders->get($firewallName);
-        $root = new RoleHierarchyItem('Root', 'ROLE_ROOT');
-        $roleHierarchy = [];
+        $tree = $this->getRoleTree($firewallName);
+        $hierarchy = [];
+
+        $this->resolve($tree, $hierarchy);
+
+        return new RoleHierarchy($hierarchy);
+    }
+
+    public function getRoleTree(string $firewallName): RoleNode
+    {
+        /** @var RoleTreeBuilderInterface $builder */
+        $builder = $this->roleTreeBuilders->get($firewallName);
+        $root = new RoleNode('Root', 'ROLE_ROOT');
 
         $builder->build($root);
 
-        $this->resolve($root, $roleHierarchy);
-
-        return new RoleHierarchy($roleHierarchy);
+        return $root;
     }
 
-    private function resolve(RoleHierarchyItem $item, array &$result): void
+    private function resolve(RoleNode $node, array &$result): void
     {
-        if (empty($item->children)) {
+        if (empty($node->children)) {
             return;
         }
 
-        $result[$item->roleName] = [];
+        $result[$node->roleName] = [];
 
-        foreach ($item->children as $child) {
-            $result[$item->roleName][] = $child->roleName;
+        foreach ($node->children as $child) {
+            $result[$node->roleName][] = $child->roleName;
 
             $this->resolve($child, $result);
         }

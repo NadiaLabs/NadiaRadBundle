@@ -11,17 +11,19 @@
 
 namespace Nadia\Bundle\NadiaRadBundle\Security\Role;
 
-interface RoleHierarchyBuilder
+interface RoleTreeBuilderInterface
 {
     /**
-     * Build role hierarchy items.
+     * Build role tree nodes.
      *
      * Example:
      * <code>
-     * #[AutoconfigureTag('nadia.tag.role_hierarchy', ['firewall_name' => 'main'])]
-     * class ExampleMenuLoader implement MenuBuilder {
-     *   public function build(RoleHierarchyItem $root): void {
-     *     // Root RoleHierarchyItem contains all roles.
+     * #[AutoconfigureTag('nadia.tag.role_tree_builder', ['firewall_name' => 'main'])]
+     * class ExampleRoleTreeBuilder implement RoleTreeBuilderInterface
+     * {
+     *   public function build(RoleNode $root): void
+     *   {
+     *     // Root RoleNode contains all roles.
      *     $r = $root->info('Super User', 'ROLE_SUPER_USER');
      *     $r->children([
      *       $r->new('Project Management', 'ROLE_PROJECT')->children([
@@ -41,8 +43,8 @@ interface RoleHierarchyBuilder
      * }
      * </code>
      *
-     * @param RoleHierarchyItem $root
+     * @param RoleNode $root
      *
      */
-    public function build(RoleHierarchyItem $root): void;
+    public function build(RoleNode $root): void;
 }

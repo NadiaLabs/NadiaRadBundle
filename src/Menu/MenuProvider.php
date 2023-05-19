@@ -74,7 +74,7 @@ final class MenuProvider
             throw new \InvalidArgumentException(sprintf('Menu name "%s" is not exists.', $menuName));
         }
 
-        /** @var MenuBuilder $menuBuilder */
+        /** @var MenuBuilderInterface $menuBuilder */
         $menuBuilder = $this->menuBuilders->get($menuName);
         $root = new MenuRootItem();
 
