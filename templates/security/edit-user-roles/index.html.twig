@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit user roles</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+{% macro render_role(nodes, roleForms) %}
+    {% if nodes is not empty %}
+        <ul>
+        {% for node in nodes %}
+            <li>
+                {{ form_widget(roleForms[node.roleName]) }}
+                {{ form_label(roleForms[node.roleName], node.title) }}
+
+                {% if node.children is not empty %}
+                    {{ _self.render_role(node.children, roleForms) }}
+                {% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endmacro %}
+
+<div>
+    {{ form_start(form) }}
+
+    <button>Update roles for "{{ identifier }}"</button>
+
+    {{ _self.render_role([roleTree], roleForms) }}
+
+    {{ form_end(form) }}
+</div>
+
+</body>
+</html>

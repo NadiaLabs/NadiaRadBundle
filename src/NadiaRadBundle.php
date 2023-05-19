@@ -13,6 +13,7 @@ namespace Nadia\Bundle\NadiaRadBundle;
 
 use Nadia\Bundle\NadiaRadBundle\DependencyInjection\Compiler\MenuBuilderPass;
 use Nadia\Bundle\NadiaRadBundle\DependencyInjection\Compiler\RoleTreeBuilderPass;
+use Nadia\Bundle\NadiaRadBundle\DependencyInjection\Compiler\UserRoleUpdaterPass;
 use Nadia\Bundle\NadiaRadBundle\DependencyInjection\NadiaRadExtension;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -25,6 +26,7 @@ class NadiaRadBundle extends AbstractBundle
     {
         $container->addCompilerPass(new MenuBuilderPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
         $container->addCompilerPass(new RoleTreeBuilderPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
+        $container->addCompilerPass(new UserRoleUpdaterPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
     }
 
     public function getContainerExtension(): ?ExtensionInterface
