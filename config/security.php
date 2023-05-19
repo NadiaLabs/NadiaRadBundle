@@ -6,8 +6,13 @@ use Nadia\Bundle\NadiaRadBundle\Security\Role\RoleHierarchyProvider;
 use Nadia\Bundle\NadiaRadBundle\Security\Voter\RoleHierarchyVoter;
 
 return static function(ContainerConfigurator $containerConfigurator) {
+    $containerConfigurator->parameters()
+        ->set('nadia.security.role_tree.cache_dir', '%kernel.cache_dir%/nadia/role_tree')
+    ;
+
     $containerConfigurator->services()
-        ->set(RoleHierarchyProvider::class)->args([null, ''])
+        ->set(RoleHierarchyProvider::class)
+            ->args([null, ''])
         ->set(RoleHierarchyVoter::class)
             ->args([
                 service(RoleHierarchyProvider::class),

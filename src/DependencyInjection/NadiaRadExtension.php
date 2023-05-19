@@ -22,7 +22,7 @@ class NadiaRadExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container): void
     {
-        $loader = new PhpFileLoader($container, new FileLocator(__DIR__ .'/../../config'));
+        $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../../config'));
 
         $this->loadMenuServices($loader, $container);
         $this->loadSecurityServices($loader, $container);
@@ -32,9 +32,7 @@ class NadiaRadExtension extends Extension
     {
         $loader->load('menu.php');
 
-        $menuCacheDir = $container->getParameter('kernel.cache_dir') . '/nadia/menus';
-        $container->setParameter('nadia.menu.cache_dir', $menuCacheDir);
-
+        $menuCacheDir = $container->getParameter('nadia.menu.cache_dir');
         if (!file_exists($menuCacheDir)) {
             mkdir($menuCacheDir, 0755, true);
         }
@@ -46,13 +44,11 @@ class NadiaRadExtension extends Extension
     {
         $loader->load('security.php');
 
-        $roleHierarchyCacheDir = $container->getParameter('kernel.cache_dir') . '/nadia/role_hierarchy';
-        $container->setParameter('nadia.security.role_hierarchy.cache_dir', $roleHierarchyCacheDir);
-
-        if (!file_exists($roleHierarchyCacheDir)) {
-            mkdir($roleHierarchyCacheDir, 0755, true);
+        $roleTreeCacheDir = $container->getParameter('nadia.security.role_tree.cache_dir');
+        if (!file_exists($roleTreeCacheDir)) {
+            mkdir($roleTreeCacheDir, 0755, true);
         }
 
-        $container->getDefinition(RoleHierarchyProvider::class)->setArgument(1, $roleHierarchyCacheDir);
+        $container->getDefinition(RoleHierarchyProvider::class)->setArgument(1, $roleTreeCacheDir);
     }
 }
