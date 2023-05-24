@@ -22,9 +22,18 @@ namespace Nadia\Bundle\NadiaRadBundle\Menu\Item;
  *   ->children([
  *     $m->item('Dashboard'),
  *     $m->item('Articles')
+ *       ->options([
+ *         'route' => 'articles',
+ *       ])
  *       ->children([
- *         $m->item('Create Article'),
- *         $m->item('Edit Article'),
+ *         $m->item('Create Article')
+ *           ->options([
+ *             'route' => 'article-create',
+ *           ]),
+ *         $m->item('Edit Article')
+ *           ->options([
+ *             'route' => 'article-edit',
+ *           ]),
  *       ]),
  *     $m->item('Tags')
  *       ->children([
