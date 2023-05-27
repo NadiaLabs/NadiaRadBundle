@@ -20,15 +20,15 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
-class RoleTreeBuilderPass implements CompilerPassInterface
+class RoleHierarchyBuilderPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        $taggedServices = $container->findTaggedServiceIds('nadia.tag.role_tree_builder');
-        $cacheDir = $container->getParameter('nadia.security.role_tree.cache_dir');
+        $taggedServices = $container->findTaggedServiceIds('nadia.tag.role_hierarchy_builder');
+        $cacheDir = $container->getParameter('nadia.security.role_hierarchy.cache_dir');
         $fs = new Filesystem();
         $finder = new Finder();
-        $roleTreeBuilderMap = [];
+        $roleHierarchyBuilderMap = [];
         $userProviderMap = [];
 
         foreach ($finder->files()->in($cacheDir) as $file) {
@@ -37,7 +37,7 @@ class RoleTreeBuilderPass implements CompilerPassInterface
 
         foreach ($taggedServices as $id => $tags) {
             $firewallName = $tags[0]['firewall_name'];
-            $roleTreeBuilderMap[$firewallName] = new Reference($id);
+            $roleHierarchyBuilderMap[$firewallName] = new Reference($id);
 
             $className = $container->getDefinition($id)->getClass();
             // Register RoleHierarchyBuilder file for resource tracking
@@ -48,7 +48,7 @@ class RoleTreeBuilderPass implements CompilerPassInterface
         }
 
         $container->getDefinition(RoleHierarchyProvider::class)
-            ->setArgument(0, ServiceLocatorTagPass::register($container, $roleTreeBuilderMap));
+            ->setArgument(0, ServiceLocatorTagPass::register($container, $roleHierarchyBuilderMap));
 
         $container->getDefinition(EditUserRolesController::class)
             ->setArgument(0, ServiceLocatorTagPass::register($container, $userProviderMap));

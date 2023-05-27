@@ -7,7 +7,7 @@
 </head>
 <body>
 
-{% macro render_role(nodes, roleForms) %}
+{% macro render_role_checkbox(nodes, roleForms) %}
     {% if nodes is not empty %}
         <ul>
         {% for node in nodes %}
@@ -16,7 +16,7 @@
                 {{ form_label(roleForms[node.roleName], node.title) }}
 
                 {% if node.children is not empty %}
-                    {{ _self.render_role(node.children, roleForms) }}
+                    {{ _self.render_role_checkbox(node.children, roleForms) }}
                 {% endif %}
             </li>
         {% endfor %}
@@ -29,7 +29,7 @@
 
     <button>Update roles for "{{ identifier }}"</button>
 
-    {{ _self.render_role([roleTree], roleForms) }}
+    {{ _self.render_role_checkbox([roleHierarchy], roleForms) }}
 
     {{ form_end(form) }}
 </div>

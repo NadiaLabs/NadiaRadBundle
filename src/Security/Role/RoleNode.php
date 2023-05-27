@@ -47,15 +47,8 @@ final class RoleNode
 
     public function __construct(string $title, string $roleName)
     {
-        $this->info($title, $roleName);
-    }
-
-    public function info(string $title, string $roleName): self
-    {
         $this->title = $title;
         $this->roleName = $roleName;
-
-        return $this;
     }
 
     /**

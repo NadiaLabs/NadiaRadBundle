@@ -17,61 +17,66 @@ use Symfony\Component\Security\Core\Role\RoleHierarchy;
 
 final class RoleHierarchyProvider
 {
-    private ServiceLocator $roleTreeBuilders;
+    private ServiceLocator $roleHierarchyBuilders;
 
     private string $cacheDir;
 
     /**
      * @var RoleHierarchy[]
      */
-    private array $cachedRoleHierarchy = [];
+    private array $cachedRoleHierarchies = [];
 
-    public function __construct(ServiceLocator $roleTreeBuilders, string $cacheDir)
+    private array $cachedRoleHierarchyRootNodes = [];
+
+    public function __construct(ServiceLocator $roleHierarchyBuilders, string $cacheDir)
     {
-        $this->roleTreeBuilders = $roleTreeBuilders;
+        $this->roleHierarchyBuilders = $roleHierarchyBuilders;
         $this->cacheDir = $cacheDir;
     }
 
     public function get(string $firewallName): RoleHierarchy
     {
-        if (!isset($this->cachedRoleHierarchy[$firewallName])) {
+        if (!isset($this->cachedRoleHierarchies[$firewallName])) {
             $fs = new Filesystem();
             $filepath = $this->cacheDir . '/' . $firewallName . '.cache';
 
             if ($fs->exists($filepath)) {
-                $this->cachedRoleHierarchy[$firewallName] = unserialize(file_get_contents($filepath));
+                $hierarchy = unserialize(file_get_contents($filepath));
             } else {
-                $this->cachedRoleHierarchy[$firewallName] = $this->getWithoutCache($firewallName);
+                $hierarchy = $this->getWithoutCache($firewallName);
 
-                file_put_contents($filepath, serialize($this->cachedRoleHierarchy[$firewallName]));
+                file_put_contents($filepath, serialize($this->cachedRoleHierarchies[$firewallName]));
             }
+
+            $this->cachedRoleHierarchies[$firewallName] = new RoleHierarchy($hierarchy);
         }
 
-        return $this->cachedRoleHierarchy[$firewallName];
+        return $this->cachedRoleHierarchies[$firewallName];
     }
 
-    public function getWithoutCache(string $firewallName): RoleHierarchy
+    public function getWithoutCache(string $firewallName): array
     {
-        $tree = $this->getRoleTree($firewallName);
+        $root = $this->getRoleHierarchyRootNode($firewallName);
         $hierarchy = [];
 
-        $this->resolve($tree, $hierarchy);
+        $this->convertRootNodeToHierarchyArray($root, $hierarchy);
 
-        return new RoleHierarchy($hierarchy);
+        return $hierarchy;
     }
 
-    public function getRoleTree(string $firewallName): RoleNode
+    public function getRoleHierarchyRootNode(string $firewallName): RoleNode
     {
-        /** @var RoleTreeBuilderInterface $builder */
-        $builder = $this->roleTreeBuilders->get($firewallName);
-        $root = new RoleNode('Root', 'ROLE_ROOT');
+        if (!isset($this->cachedRoleHierarchyRootNodes[$firewallName])) {
+            /** @var RoleHierarchyBuilderInterface $builder */
+            $builder = $this->roleHierarchyBuilders->get($firewallName);
 
-        $builder->build($root);
+            $this->cachedRoleHierarchyRootNodes[$firewallName] = $builder->build();
+        }
 
-        return $root;
+        return $this->cachedRoleHierarchyRootNodes[$firewallName];
     }
 
-    private function resolve(RoleNode $node, array &$result): void
+    private function convertRootNodeToHierarchyArray(RoleNode $node, array &$result): void
     {
         if (empty($node->children)) {
             return;
@@ -82,7 +87,7 @@ final class RoleHierarchyProvider
         foreach ($node->children as $child) {
             $result[$node->roleName][] = $child->roleName;
 
-            $this->resolve($child, $result);
+            $this->convertRootNodeToHierarchyArray($child, $result);
         }
     }
 }

@@ -42,10 +42,10 @@ final class EditUserRolesController
         /** @var UserProviderInterface $userProvider */
         $userProvider = $this->userProviders->get($firewall);
         $user = $userProvider->loadUserByIdentifier($identifier);
-        $roleTree = $roleHierarchyProvider->getRoleTree($firewall);
+        $roleHierarchy = $roleHierarchyProvider->getRoleHierarchyRootNode($firewall);
 
         $data = new EditUserRoles($user->getRoles());
-        $form = $formFactory->create(EditUserRolesType::class, $data, ['role_tree' => $roleTree]);
+        $form = $formFactory->create(EditUserRolesType::class, $data, ['role_hierarchy_root_node' => $roleHierarchy]);
         $formView = $form->createView();
 
         if ($request->isMethod('POST')) {
@@ -71,7 +71,7 @@ final class EditUserRolesController
 
         $viewData = [
             'identifier' => $identifier,
-            'roleTree' => $roleTree,
+            'roleHierarchy' => $roleHierarchy,
             'form' => $formView,
             'roleForms' => $roleForms,
         ];

@@ -14,7 +14,7 @@ final class EditUserRolesType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $rolesChoices = [];
-        $this->prepareRolesChoices($options['role_tree'], $rolesChoices);
+        $this->prepareRolesChoices($options['role_hierarchy_root_node'], $rolesChoices);
 
         $builder
             ->add('roles', ChoiceType::class, [
@@ -31,8 +31,8 @@ final class EditUserRolesType extends AbstractType
             'data_class' => EditUserRoles::class,
         ]);
 
-        $resolver->setRequired('role_tree');
-        $resolver->setAllowedTypes('role_tree', RoleNode::class);
+        $resolver->setRequired('role_hierarchy_root_node');
+        $resolver->setAllowedTypes('role_hierarchy_root_node', RoleNode::class);
     }
 
     private function prepareRolesChoices(RoleNode $node, array &$choices): void

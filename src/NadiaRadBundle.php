@@ -12,7 +12,7 @@
 namespace Nadia\Bundle\NadiaRadBundle;
 
 use Nadia\Bundle\NadiaRadBundle\DependencyInjection\Compiler\MenuBuilderPass;
-use Nadia\Bundle\NadiaRadBundle\DependencyInjection\Compiler\RoleTreeBuilderPass;
+use Nadia\Bundle\NadiaRadBundle\DependencyInjection\Compiler\RoleHierarchyBuilderPass;
 use Nadia\Bundle\NadiaRadBundle\DependencyInjection\Compiler\UserRoleUpdaterPass;
 use Nadia\Bundle\NadiaRadBundle\Menu\MenuProvider;
 use Nadia\Bundle\NadiaRadBundle\Security\Role\RoleHierarchyProvider;
@@ -28,7 +28,7 @@ class NadiaRadBundle extends AbstractBundle
     public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new MenuBuilderPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
-        $container->addCompilerPass(new RoleTreeBuilderPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
+        $container->addCompilerPass(new RoleHierarchyBuilderPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
         $container->addCompilerPass(new UserRoleUpdaterPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
     }
 
@@ -56,11 +56,11 @@ class NadiaRadBundle extends AbstractBundle
     {
         $loader->load('security.php');
 
-        $roleTreeCacheDir = $builder->getParameter('nadia.security.role_tree.cache_dir');
-        if (!file_exists($roleTreeCacheDir)) {
-            mkdir($roleTreeCacheDir, 0755, true);
+        $roleHierarchyCacheDir = $builder->getParameter('nadia.security.role_hierarchy.cache_dir');
+        if (!file_exists($roleHierarchyCacheDir)) {
+            mkdir($roleHierarchyCacheDir, 0755, true);
         }
 
-        $builder->getDefinition(RoleHierarchyProvider::class)->setArgument(1, $roleTreeCacheDir);
+        $builder->getDefinition(RoleHierarchyProvider::class)->setArgument(1, $roleHierarchyCacheDir);
     }
 }
